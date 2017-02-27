@@ -29,6 +29,7 @@ import scala.concurrent.{Await, ExecutionContext}
 import akka.actor.{Actor, ActorSystem, Address, Props}
 import akka.testkit.TestProbe
 import com.typesafe.config.{Config, ConfigFactory, ConfigParseOptions, ConfigValueFactory}
+import lacasa.Box
 
 import org.apache.gearpump.cluster.MasterHarness.MockMaster
 import org.apache.gearpump.util.Constants._
@@ -104,6 +105,7 @@ trait MasterHarness {
       case ex: UnknownHostException =>
         isPortUsed = false
       case ex: Throwable =>
+        Box.uncheckedCatchControl
         // For other case, we think the port has been occupied.
         isPortUsed = true
     } finally {

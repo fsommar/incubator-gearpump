@@ -161,7 +161,7 @@ object BuildGearpump extends sbt.Build {
     id = "gearpump-core",
     base = file("core"),
     settings = commonSettings ++ myAssemblySettings ++ javadocSettings ++ coreDependencies ++
-      addArtifact(Artifact("gearpump-core"), sbtassembly.AssemblyKeys.assembly) ++ Seq(
+      lacasaDependencies ++ addArtifact(Artifact("gearpump-core"), sbtassembly.AssemblyKeys.assembly) ++ Seq(
 
       assemblyOption in assembly ~= {
         _.copy(includeScala = true)
@@ -181,7 +181,7 @@ object BuildGearpump extends sbt.Build {
   lazy val streaming = Project(
     id = "gearpump-streaming",
     base = file("streaming"),
-    settings = commonSettings ++ myAssemblySettings ++ javadocSettings ++
+    settings = commonSettings ++ myAssemblySettings ++ javadocSettings ++ lacasaDependencies ++
       addArtifact(Artifact("gearpump-streaming"), sbtassembly.AssemblyKeys.assembly) ++
       Seq(
         assemblyMergeStrategy in assembly := {

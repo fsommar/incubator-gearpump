@@ -53,6 +53,7 @@ object Dependencies {
   val algebirdVersion = "0.9.0"
   val chillVersion = "0.6.0"
   val jedisVersion = "2.9.0"
+  val lacasaVersion = "0.1.0-SNAPSHOT"
 
   val coreDependencies = Seq(
     libraryDependencies ++= Seq(
@@ -99,4 +100,17 @@ object Dependencies {
       "junit" % "junit" % junitVersion % "test"
     )
   )
+
+  val lacasaDependencies = Seq(
+    scalacOptions ++= Seq("-P:lacasa:enable"),
+
+    autoCompilerPlugins := true,
+
+    addCompilerPlugin("io.github.phaller" % "lacasa-plugin_2.11.8" % lacasaVersion),
+
+    libraryDependencies ++= Seq(
+      "io.github.phaller" % "lacasa-akka_2.11.8" % lacasaVersion
+    )
+  )
+
 }

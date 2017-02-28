@@ -33,6 +33,7 @@ import org.scalatest.{Matchers, PropSpec}
 
 import org.apache.gearpump.Message
 import org.apache.gearpump.streaming.MockUtil
+import lacasa.Safe
 
 class KafkaSinkSpec extends PropSpec with PropertyChecks with Matchers with MockitoSugar {
 
@@ -54,6 +55,8 @@ class KafkaSinkSpec extends PropSpec with PropertyChecks with Matchers with Mock
         when(configFactory.getKafkaConfig(props)).thenReturn(config)
         when(producerFactory.getKafkaProducer(config)).thenReturn(producer)
 
+        // TODO(fsommar): Use IndexedSeq[Byte] instead.
+        implicit val ev: Safe[Array[Byte]] = new Safe[Array[Byte]] {}
         val (topic, key, msg) = data
         val kafkaSink = new KafkaSink(topic, props, configFactory, producerFactory)
         kafkaSink.write(Message((key, msg)))

@@ -33,6 +33,7 @@ import org.apache.gearpump.streaming.dsl.window.api.Discarding
 import org.apache.gearpump.streaming.task.TaskContext
 import org.apache.gearpump.util.LogUtil
 import org.slf4j.Logger
+import lacasa.Safe
 
 
 trait WindowRunner {
@@ -51,6 +52,8 @@ class DefaultWindowRunner[IN, GROUP, OUT](
     taskContext: TaskContext, userConfig: UserConfig,
     groupBy: GroupAlsoByWindow[IN, GROUP])(implicit system: ActorSystem)
   extends WindowRunner {
+  implicit val inSafe: Safe[IN] = implicitly
+  implicit val outSafe: Safe[OUT] = implicitly
 
   private val windowFn = groupBy.window.windowFn
   private val groupedInputs = new TreeSortedMap[WindowAndGroup[GROUP], FastList[IN]]

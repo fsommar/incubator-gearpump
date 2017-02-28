@@ -26,6 +26,7 @@ import org.scalatest.mock.MockitoSugar
 import org.apache.gearpump.Message
 import org.apache.gearpump.cluster.UserConfig
 import org.apache.gearpump.streaming.task.TaskContext
+import lacasa.Safe
 
 class SplitSpec extends FlatSpec with Matchers with MockitoSugar {
 
@@ -33,6 +34,8 @@ class SplitSpec extends FlatSpec with Matchers with MockitoSugar {
     val taskContext = mock[TaskContext]
     val split = new Split(taskContext, UserConfig.empty)
 
+    // TODO(fsommar): Use IndexedSeq[Byte] instead.
+    implicit val ev: Safe[Array[Byte]] = new Safe[Array[Byte]] {}
     val msg = "this is a test message"
     split.onNext(Message(Injection[String, Array[Byte]](msg)))
     verify(taskContext, times(msg.split(" ").length)).output(anyObject[Message])

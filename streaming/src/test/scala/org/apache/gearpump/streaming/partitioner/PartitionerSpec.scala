@@ -20,9 +20,12 @@ package org.apache.gearpump.streaming.partitioner
 
 import org.apache.gearpump.Message
 import org.scalatest.{FlatSpec, Matchers}
+import lacasa.Safe
 
 class PartitionerSpec extends FlatSpec with Matchers {
   val NUM = 10
+  // TODO(fsommar): Use IndexedSeq[Byte] instad, as it's actually Safe.
+  implicit val ev: Safe[Array[Byte]] = new Safe[Array[Byte]] {}
 
   "HashPartitioner" should "hash same key to same slots" in {
     val partitioner = new HashPartitioner

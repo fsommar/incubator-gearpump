@@ -25,6 +25,7 @@ import org.apache.gearpump.cluster.UserConfig
 import org.apache.gearpump.streaming.Constants._
 import org.apache.gearpump.streaming.dsl.plan.functions.FunctionRunner
 import org.apache.gearpump.streaming.task.{Task, TaskContext}
+import lacasa.Safe
 
 /**
  * Default Task container for [[org.apache.gearpump.streaming.source.DataSource]] that
@@ -44,6 +45,8 @@ class DataSourceTask[IN, OUT] private[source](
     source: DataSource,
     operator: Option[FunctionRunner[IN, OUT]])
   extends Task(context, conf) {
+  implicit val inSafe: Safe[IN] = implicitly
+  implicit val outSafe: Safe[OUT] = implicitly
 
   def this(context: TaskContext, conf: UserConfig) = {
     this(context, conf,

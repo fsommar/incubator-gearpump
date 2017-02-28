@@ -29,6 +29,7 @@ import org.apache.gearpump.streaming.ProcessorId
 import org.apache.gearpump.streaming.appmaster.AppMaster.{LookupTaskActorRef, TaskActorRef}
 import org.apache.gearpump.streaming.task.{Task, TaskContext, TaskId}
 import org.reactivestreams.{Subscriber, Subscription}
+import lacasa.Safe
 
 import scala.concurrent.ExecutionContext
 
@@ -64,6 +65,8 @@ class SourceBridgeTask(taskContext : TaskContext, userConf : UserConfig)
       LOG.error("the stream has error", ex)
     case AkkaStreamMessage(msg) =>
       LOG.info("we have received message from akka stream source: " + msg)
+      // TODO(fsommar): Ensure that msg is actually Safe.
+      implicit val ev: Safe[Any] = new Safe[Any] {}
       taskContext.output(Message(msg, Instant.now()))
     case Complete(description) =>
       LOG.info("the stream is completed: " + description)

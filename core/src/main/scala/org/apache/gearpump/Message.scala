@@ -19,6 +19,7 @@
 package org.apache.gearpump
 
 import java.time.Instant
+import lacasa.Safe
 
 /**
  * Each message contains an immutable timestamp.
@@ -29,6 +30,8 @@ import java.time.Instant
  * @param msg Accept any type except Null, Nothing and Unit
  */
 case class Message(msg: Any, timeInMillis: TimeStamp) {
+  type T
+  implicit val safeEv: Safe[T] = implicitly
 
   /**
    * @param msg Accept any type except Null, Nothing and Unit
@@ -59,7 +62,7 @@ object Message {
    *
    * @param msg Accept any type except Null, Nothing and Uni
    */
-  def apply(msg: Any): Message = {
+  def apply[T: Safe](msg: T): Message = {
     new Message(msg)
   }
 
@@ -67,7 +70,7 @@ object Message {
    * @param msg Accept any type except Null, Nothing and Unit
    * @param timestamp timestamp cannot be larger than Instant.ofEpochMilli(Long.MaxValue)
    */
-  def apply(msg: Any, timestamp: Instant): Message = {
+  def apply[T: Safe](msg: T, timestamp: Instant): Message = {
     new Message(msg, timestamp)
   }
 }

@@ -25,6 +25,7 @@ import org.apache.gearpump.streaming.serializer.ChillSerializer
 import org.apache.gearpump.streaming.state.api.{PersistentState, PersistentTask}
 import org.apache.gearpump.streaming.state.impl.NonWindowState
 import org.apache.gearpump.streaming.task.TaskContext
+import lacasa.Safe
 
 class CountProcessor(taskContext: TaskContext, conf: UserConfig)
   extends PersistentTask[Int](taskContext, conf) {
@@ -38,6 +39,8 @@ class CountProcessor(taskContext: TaskContext, conf: UserConfig)
 
   override def processMessage(state: PersistentState[Int], message: Message): Unit = {
     state.update(message.timestamp.toEpochMilli, 1)
+    // TODO(fsommar): Use IndexedSeq[Byte] instead of Array[Byte].
+    implicit val ev: Safe[Array[Byte]] = new Safe[Array[Byte]] {}
     state.get.foreach(s => taskContext.output(Message(serializer.serialize(s), message.timestamp)))
   }
 }

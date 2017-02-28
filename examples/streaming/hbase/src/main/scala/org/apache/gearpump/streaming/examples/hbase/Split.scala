@@ -24,6 +24,7 @@ import org.apache.gearpump.Message
 import org.apache.gearpump.streaming.source.DataSource
 import org.apache.gearpump.streaming.task.TaskContext
 import org.apache.hadoop.hbase.util.Bytes
+import lacasa.Safe
 
 class Split extends DataSource {
 
@@ -33,6 +34,8 @@ class Split extends DataSource {
 
   override def read(): Message = {
 
+    // TODO(fsommar): Use IndexedSeq[Byte] instead of Array[Byte] (the latter isn't Safe).
+    implicit val ev: Safe[Array[Byte]] = new Safe[Array[Byte]] {}
     val tuple = (Bytes.toBytes(s"$x"), Bytes.toBytes("group"),
       Bytes.toBytes("group:name"), Bytes.toBytes("99"))
     x+=1

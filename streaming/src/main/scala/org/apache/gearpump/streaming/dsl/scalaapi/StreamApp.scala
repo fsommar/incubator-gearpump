@@ -31,6 +31,7 @@ import org.apache.gearpump.streaming.task.TaskContext
 import org.apache.gearpump.util.Graph
 
 import scala.language.implicitConversions
+import lacasa.Safe
 
 /**
  * Example:
@@ -91,6 +92,7 @@ object StreamApp {
 
 /** A test message source which generated message sequence repeatedly. */
 class CollectionDataSource[T](seq: Seq[T]) extends DataSource {
+  implicit val safeEv: Safe[T] = implicitly
   private lazy val iterator: Iterator[T] = seq.iterator
 
   override def open(context: TaskContext, startTime: Instant): Unit = {}

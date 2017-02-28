@@ -22,6 +22,7 @@ import org.apache.gearpump.akkastream.task.Unzip2Task.UnZipFunction
 import org.apache.gearpump.Message
 import org.apache.gearpump.cluster.UserConfig
 import org.apache.gearpump.streaming.task.TaskContext
+import lacasa.Safe
 
 class Unzip2Task[In, A1, A2](context: TaskContext, userConf : UserConfig)
   extends GraphTask(context, userConf) {
@@ -34,6 +35,8 @@ class Unzip2Task[In, A1, A2](context: TaskContext, userConf : UserConfig)
     val time = msg.timestamp
     val pair = unzip(message.asInstanceOf[In])
     val (a, b) = pair
+    // TODO(fsommar): Ensure a and b are Safe. Are they instances of A1 and A2?
+    implicit val ev: Safe[AnyRef] = new Safe[AnyRef] {}
     output(0, Message(a.asInstanceOf[AnyRef], time))
     output(1, Message(b.asInstanceOf[AnyRef], time))
   }

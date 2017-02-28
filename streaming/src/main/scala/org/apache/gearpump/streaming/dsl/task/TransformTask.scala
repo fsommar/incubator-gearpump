@@ -24,9 +24,12 @@ import org.apache.gearpump.cluster.UserConfig
 import org.apache.gearpump.streaming.Constants._
 import org.apache.gearpump.streaming.dsl.plan.functions.FunctionRunner
 import org.apache.gearpump.streaming.task.{Task, TaskContext}
+import lacasa.Safe
 
 class TransformTask[IN, OUT](operator: Option[FunctionRunner[IN, OUT]],
     taskContext: TaskContext, userConf: UserConfig) extends Task(taskContext, userConf) {
+  implicit val inSafe: Safe[IN] = implicitly
+  implicit val outSafe: Safe[OUT] = implicitly
 
   def this(taskContext: TaskContext, userConf: UserConfig) = {
     this(userConf.getValue[FunctionRunner[IN, OUT]](
@@ -46,7 +49,7 @@ class TransformTask[IN, OUT](operator: Option[FunctionRunner[IN, OUT]],
           taskContext.output(Message(msg, time))
         }
       case None =>
-        taskContext.output(Message(msg.msg, time))
+        taskContext.output(msg.copy())
     }
   }
 

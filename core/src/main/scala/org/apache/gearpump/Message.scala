@@ -29,7 +29,7 @@ import lacasa.Safe
  *
  * @param msg Accept any type except Null, Nothing and Unit
  */
-trait Message {
+sealed trait Message {
   def msg: Any
   def timeInMillis: TimeStamp
   def timestamp: Instant
@@ -37,13 +37,15 @@ trait Message {
 }
 
 object Message {
+  import org.apache.gearpump
+  implicit val ev: Safe[gearpump.Message] = new Safe[gearpump.Message] {}
 
   /**
    * Instant.EPOCH is used for default timestamp
    *
    * @param msg Accept any type except Null, Nothing and Uni
    */
-  def apply[T: Safe](msg: T): org.apache.gearpump.Message = {
+  def apply[T: Safe](msg: T): gearpump.Message = {
     new Message(msg)
   }
 
@@ -51,19 +53,19 @@ object Message {
    * @param msg Accept any type except Null, Nothing and Unit
    * @param timestamp timestamp cannot be larger than Instant.ofEpochMilli(Long.MaxValue)
    */
-  def apply[T: Safe](msg: T, timestamp: Instant): org.apache.gearpump.Message = {
+  def apply[T: Safe](msg: T, timestamp: Instant): gearpump.Message = {
     new Message(msg, timestamp)
   }
 
-  def apply[T: Safe](msg: T, timeInMillis: TimeStamp): org.apache.gearpump.Message = {
+  def apply[T: Safe](msg: T, timeInMillis: TimeStamp): gearpump.Message = {
     new Message(msg, timeInMillis)
   }
 
-  def unapply(msg: org.apache.gearpump.Message): Option[(Any, TimeStamp)] = {
+  def unapply(msg: gearpump.Message): Option[(Any, TimeStamp)] = {
     Some((msg.msg, msg.timeInMillis))
   }
 
-  private case class Message (msg: Any, timeInMillis: TimeStamp) extends org.apache.gearpump.Message {
+  private case class Message (msg: Any, timeInMillis: TimeStamp) extends gearpump.Message {
 
     /**
     * @param msg Accept any type except Null, Nothing and Unit
@@ -86,6 +88,6 @@ object Message {
       Instant.ofEpochMilli(timeInMillis)
     }
 
-    def copy(msg: Any = msg, timeInMillis: TimeStamp = timeInMillis): org.apache.gearpump.Message = this.copy(msg, timeInMillis)
+    def copy(msg: Any = msg, timeInMillis: TimeStamp = timeInMillis): gearpump.Message = this.copy(msg, timeInMillis)
   }
 }

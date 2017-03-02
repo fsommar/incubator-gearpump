@@ -29,30 +29,11 @@ import lacasa.Safe
  *
  * @param msg Accept any type except Null, Nothing and Unit
  */
-case class Message(msg: Any, timeInMillis: TimeStamp) {
-  type T
-  implicit val safeEv: Safe[T] = implicitly
-
-  /**
-   * @param msg Accept any type except Null, Nothing and Unit
-   * @param timestamp timestamp cannot be larger than Instant.ofEpochMilli(Long.MaxValue)
-   */
-  def this(msg: Any, timestamp: Instant) = {
-    this(msg, timestamp.toEpochMilli)
-  }
-
-  /**
-   * Instant.EPOCH is used for default timestamp
-   *
-   * @param msg Accept any type except Null, Nothing and Uni
-   */
-  def this(msg: Any) = {
-    this(msg, Instant.EPOCH)
-  }
-
-  def timestamp: Instant = {
-    Instant.ofEpochMilli(timeInMillis)
-  }
+trait Message {
+  def msg: Any
+  def timeInMillis: TimeStamp
+  def timestamp: Instant
+  def copy(msg: Any = msg, timeInMillis: TimeStamp = timeInMillis): Message
 }
 
 object Message {
@@ -62,7 +43,7 @@ object Message {
    *
    * @param msg Accept any type except Null, Nothing and Uni
    */
-  def apply[T: Safe](msg: T): Message = {
+  def apply[T: Safe](msg: T): org.apache.gearpump.Message = {
     new Message(msg)
   }
 
@@ -70,7 +51,41 @@ object Message {
    * @param msg Accept any type except Null, Nothing and Unit
    * @param timestamp timestamp cannot be larger than Instant.ofEpochMilli(Long.MaxValue)
    */
-  def apply[T: Safe](msg: T, timestamp: Instant): Message = {
+  def apply[T: Safe](msg: T, timestamp: Instant): org.apache.gearpump.Message = {
     new Message(msg, timestamp)
+  }
+
+  def apply[T: Safe](msg: T, timeInMillis: TimeStamp): org.apache.gearpump.Message = {
+    new Message(msg, timeInMillis)
+  }
+
+  def unapply(msg: org.apache.gearpump.Message): Option[(Any, TimeStamp)] = {
+    Some((msg.msg, msg.timeInMillis))
+  }
+
+  private case class Message (msg: Any, timeInMillis: TimeStamp) extends org.apache.gearpump.Message {
+
+    /**
+    * @param msg Accept any type except Null, Nothing and Unit
+    * @param timestamp timestamp cannot be larger than Instant.ofEpochMilli(Long.MaxValue)
+    */
+    def this(msg: Any, timestamp: Instant) = {
+      this(msg, timestamp.toEpochMilli)
+    }
+
+    /**
+    * Instant.EPOCH is used for default timestamp
+    *
+    * @param msg Accept any type except Null, Nothing and Uni
+    */
+    def this(msg: Any) = {
+      this(msg, Instant.EPOCH)
+    }
+
+    def timestamp: Instant = {
+      Instant.ofEpochMilli(timeInMillis)
+    }
+
+    def copy(msg: Any = msg, timeInMillis: TimeStamp = timeInMillis): org.apache.gearpump.Message = this.copy(msg, timeInMillis)
   }
 }

@@ -23,9 +23,12 @@ import java.time.Instant
 import org.apache.gearpump.Message
 import org.apache.gearpump.cluster.UserConfig
 import org.apache.gearpump.streaming.task.TaskContext
+import lacasa.Safe
 
 class FoldTask[In, Out](context: TaskContext, userConf : UserConfig)
   extends GraphTask(context, userConf) {
+  implicit val inSafe: Safe[In] = implicitly
+  implicit val outSafe: Safe[Out] = implicitly
 
   val zero = userConf.getValue[Out](FoldTask.ZERO)
   val aggregator = userConf.getValue[(Out, In) => Out](FoldTask.AGGREGATOR)
@@ -44,7 +47,7 @@ class FoldTask[In, Out](context: TaskContext, userConf : UserConfig)
     aggregator.foreach(func => {
       aggregated = func(aggregated, data)
       LOG.info(s"aggregated = $aggregated")
-      val msg = new Message(aggregated, time)
+      val msg = Message(aggregated, time)
       context.output(msg)
     })
   }

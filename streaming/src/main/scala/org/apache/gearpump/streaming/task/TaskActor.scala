@@ -34,6 +34,7 @@ import org.apache.gearpump.streaming.ExecutorToAppMaster._
 import org.apache.gearpump.streaming.ProcessorId
 import org.apache.gearpump.util.{LogUtil, TimeOutScheduler}
 import org.apache.gearpump.{MAX_TIME_MILLIS, Message, MIN_TIME_MILLIS, TimeStamp}
+import lacasa.Safe
 
 /**
  *
@@ -233,6 +234,8 @@ class TaskActor(
       subscriptions.find(_._1 == ack.taskId.processorId).foreach(_._2.receiveAck(ack))
       doHandleMessage()
     case inputMessage: SerializedMessage =>
+      // TODO(fsommar): Ensure actual value is Safe
+      implicit val ev: Safe[Any] = new Safe[Any] {}
       val message = Message(serializerPool.get().deserialize(inputMessage.bytes),
         inputMessage.timeStamp)
       receiveMessage(message, sender)

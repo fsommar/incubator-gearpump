@@ -34,6 +34,6 @@ class Split(taskContext: TaskContext, conf: UserConfig) extends Task(taskContext
   override def onNext(msg: Message): Unit = {
     Injection.invert[String, Array[Byte]](msg.msg.asInstanceOf[Array[Byte]])
       .foreach(_.split("\\s+").foreach(
-        word => output(new Message(word, msg.timestamp))))
+        word => output(Message(word, msg.timestamp))))
   }
 }

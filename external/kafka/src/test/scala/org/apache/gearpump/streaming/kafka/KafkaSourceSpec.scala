@@ -40,6 +40,7 @@ import org.scalacheck.Gen
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.prop.PropertyChecks
 import org.scalatest.{Matchers, PropSpec}
+import lacasa.Safe
 
 class KafkaSourceSpec extends PropSpec with PropertyChecks with Matchers with MockitoSugar {
 
@@ -170,6 +171,8 @@ class KafkaSourceSpec extends PropSpec with PropertyChecks with Matchers with Mo
       } else {
         msgQueue.foreach { kafkaMsg =>
           when(fetchThread.poll).thenReturn(Option(kafkaMsg))
+          // TODO(fsommar): Use IndexedSeq[Byte]
+          implicit val ev: Safe[Array[Byte]] = new Safe[Array[Byte]] {}
           val message = Message(kafkaMsg.msg, kafkaMsg.offset)
           val msgAndWmk = MessageAndWatermark(message, Instant.ofEpochMilli(kafkaMsg.offset))
           when(messageDecoder.fromBytes(kafkaMsg.key.get, kafkaMsg.msg)).thenReturn(msgAndWmk)

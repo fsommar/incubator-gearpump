@@ -21,6 +21,7 @@ import akka.actor.ActorRef
 import org.apache.gearpump.cluster.master.Master.MasterInfo
 import org.apache.gearpump.cluster.scheduler.Resource
 import org.apache.gearpump.cluster.worker.WorkerId
+import lacasa.Safe
 
 /**
  * Cluster Bootup Flow
@@ -28,23 +29,39 @@ import org.apache.gearpump.cluster.worker.WorkerId
 object WorkerToMaster {
 
   /** When an worker is started, it sends RegisterNewWorker */
-  case object RegisterNewWorker
+  case object RegisterNewWorker {
+    implicit val ev: Safe[RegisterNewWorker.type] = new Safe[RegisterNewWorker.type] {}
+  }
 
   /** When worker lose connection with master, it tries to register itself again with old Id. */
   case class RegisterWorker(workerId: WorkerId)
+  object RegisterWorker {
+    implicit val ev: Safe[RegisterWorker] = new Safe[RegisterWorker] {}
+  }
 
   /** Worker is responsible to broadcast its current status to master */
   case class ResourceUpdate(worker: ActorRef, workerId: WorkerId, resource: Resource)
+  object ResourceUpdate {
+    implicit val ev: Safe[ResourceUpdate] = new Safe[ResourceUpdate] {}
+  }
 }
 
 object MasterToWorker {
 
   /** Master confirm the reception of RegisterNewWorker or RegisterWorker */
   case class WorkerRegistered(workerId: WorkerId, masterInfo: MasterInfo)
+  object WorkerRegistered {
+    implicit val ev: Safe[WorkerRegistered] = new Safe[WorkerRegistered] {}
+  }
 
   /** Worker have not received reply from master */
   case class UpdateResourceFailed(reason: String = null, ex: Throwable = null)
+  object UpdateResourceFailed {
+    implicit val ev: Safe[UpdateResourceFailed] = new Safe[UpdateResourceFailed] {}
+  }
 
   /** Master is synced with worker on resource slots managed by current worker */
-  case object UpdateResourceSucceed
+  case object UpdateResourceSucceed {
+    implicit val ev: Safe[UpdateResourceSucceed.type] = new Safe[UpdateResourceSucceed.type] {}
+  }
 }

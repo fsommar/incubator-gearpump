@@ -36,6 +36,7 @@ import org.apache.gearpump.cluster.master.Master._
 import org.apache.gearpump.util.Constants._
 import org.apache.gearpump.util.{ActorUtil, TimeOutScheduler, Util, _}
 import org.slf4j.Logger
+import lacasa.Safe
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -356,6 +357,9 @@ object AppManager {
   final val MASTER_STATE = "master_state"
 
   case class RecoverApplication(appMetaData: ApplicationMetaData)
+  object RecoverApplication {
+    implicit val ev: Safe[RecoverApplication] = new Safe[RecoverApplication] {}
+  }
 
   case class MasterState(maxId: Int, applicationRegistry: Map[Int, ApplicationRuntimeInfo])
 }

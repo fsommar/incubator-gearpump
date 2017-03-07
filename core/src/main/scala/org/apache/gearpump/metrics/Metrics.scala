@@ -22,6 +22,7 @@ import scala.collection.JavaConverters._
 
 import akka.actor._
 import org.slf4j.Logger
+import lacasa.Safe
 
 import com.codahale.metrics._
 import org.apache.gearpump.metrics
@@ -67,6 +68,7 @@ object Metrics extends ExtensionId[Metrics] with ExtensionIdProvider {
   }
 
   object MetricType {
+    implicit val ev: Safe[MetricType] = new Safe[MetricType] {}
     def unapply(obj: MetricType): Option[(Histogram, Counter, Meter, Timer, Gauge)] = {
       obj match {
         case x: Histogram => Some((x, null, null, null, null))

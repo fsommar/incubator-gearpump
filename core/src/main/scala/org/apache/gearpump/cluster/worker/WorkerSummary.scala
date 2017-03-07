@@ -18,6 +18,7 @@
 
 package org.apache.gearpump.cluster.worker
 import org.apache.gearpump.util.HistoryMetricsService.HistoryMetricsConfig
+import lacasa.Safe
 
 /**
  * Worker summary information for REST API.
@@ -45,3 +46,6 @@ object WorkerSummary {
 }
 
 case class ExecutorSlots(appId: Int, executorId: Int, slots: Int)
+object ExecutorSlots {
+  implicit val ev: Safe[ExecutorSlots] = new Safe[ExecutorSlots] {}
+}

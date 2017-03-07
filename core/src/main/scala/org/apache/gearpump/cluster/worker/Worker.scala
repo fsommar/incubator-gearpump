@@ -45,6 +45,7 @@ import org.apache.gearpump.util.Constants._
 import org.apache.gearpump.util.HistoryMetricsService.HistoryMetricsConfig
 import org.apache.gearpump.util.{TimeOutScheduler, _}
 import org.slf4j.Logger
+import lacasa.Safe
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future, Promise}
@@ -332,6 +333,9 @@ private[cluster] class Worker(masterProxy: ActorRef) extends Actor with TimeOutS
 private[cluster] object Worker {
 
   case class ExecutorResult(result: Try[Int])
+  object ExecutorResult {
+    implicit val ev: Safe[ExecutorResult] = new Safe[ExecutorResult] {}
+  }
 
   class ExecutorWatcher(
       launch: LaunchExecutor,

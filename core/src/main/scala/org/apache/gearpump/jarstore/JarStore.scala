@@ -24,10 +24,14 @@ import java.util.ServiceLoader
 
 import com.typesafe.config.Config
 import org.apache.gearpump.util.Util
+import lacasa.Safe
 
 import scala.collection.JavaConverters._
 
 case class FilePath(path: String)
+object FilePath {
+  implicit val ev: Safe[FilePath] = new Safe[FilePath] {}
+}
 
 /**
  * JarStore is used to manage the upload/download of binary files,

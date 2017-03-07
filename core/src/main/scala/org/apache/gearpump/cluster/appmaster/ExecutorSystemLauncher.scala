@@ -22,6 +22,7 @@ import scala.concurrent.duration._
 
 import akka.actor._
 import org.slf4j.Logger
+import lacasa.Safe
 
 import org.apache.gearpump.cluster.AppMasterToWorker.LaunchExecutor
 import org.apache.gearpump.cluster.ExecutorJVMConfig
@@ -96,6 +97,9 @@ private[appmaster]
 object ExecutorSystemLauncher {
 
   case class LaunchExecutorSystem(worker: WorkerInfo, systemId: Int, resource: Resource)
+  object LaunchExecutorSystem {
+    implicit val ev: Safe[LaunchExecutorSystem] = new Safe[LaunchExecutorSystem] {}
+  }
 
   case class LaunchExecutorSystemSuccess(system: ExecutorSystem, session: Session)
 

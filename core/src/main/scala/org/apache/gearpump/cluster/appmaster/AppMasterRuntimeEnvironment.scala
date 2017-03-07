@@ -19,6 +19,7 @@
 package org.apache.gearpump.cluster.appmaster
 
 import akka.actor._
+import lacasa.Safe
 
 import org.apache.gearpump.cluster.AppMasterToMaster.RegisterAppMaster
 import org.apache.gearpump.cluster.appmaster.AppMasterRuntimeEnvironment._
@@ -154,7 +155,9 @@ object AppMasterRuntimeEnvironment {
     }
   }
 
-  private[appmaster] case object StartAppMaster
+  private[appmaster] case object StartAppMaster {
+    implicit val ev: Safe[StartAppMaster.type] = new Safe[StartAppMaster.type] {}
+  }
 
   /**
    * This enhance Master by providing new service: StartExecutorSystems

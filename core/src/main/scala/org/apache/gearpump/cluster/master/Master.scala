@@ -30,6 +30,7 @@ import akka.remote.DisassociatedEvent
 import com.typesafe.config.Config
 import org.apache.commons.lang.exception.ExceptionUtils
 import org.slf4j.Logger
+import lacasa.Safe
 
 import org.apache.gearpump.cluster.AppMasterToMaster._
 import org.apache.gearpump.cluster.ClientToMaster._
@@ -299,15 +300,25 @@ object Master {
   final val WORKER_ID = "next_worker_id"
 
   case class WorkerTerminated(workerId: WorkerId)
+  object WorkerTerminated {
+    implicit val ev: Safe[WorkerTerminated] = new Safe[WorkerTerminated] {}
+  }
 
   case class MasterInfo(master: ActorRef, startTime: Long = 0L)
 
   /** Notify the subscriber that master actor list has been updated */
   case class MasterListUpdated(masters: List[MasterNode])
+  object MasterListUpdated {
+    implicit val ev: Safe[MasterListUpdated] = new Safe[MasterListUpdated] {}
+  }
 
   object MasterInfo {
+    implicit val ev: Safe[MasterInfo] = new Safe[MasterInfo] {}
     def empty: MasterInfo = MasterInfo(null)
   }
 
   case class SlotStatus(totalSlots: Int, availableSlots: Int)
+  object SlotStatus {
+    implicit val ev: Safe[SlotStatus] = new Safe[SlotStatus] {}
+  }
 }

@@ -25,6 +25,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.gearpump.cluster.appmaster.WorkerInfo
 import org.apache.gearpump.cluster.scheduler.Resource
 import org.apache.gearpump.jarstore.FilePath
+import lacasa.Safe
 
 import scala.reflect.ClassTag
 
@@ -41,6 +42,9 @@ import scala.reflect.ClassTag
  */
 case class AppDescription(name: String, appMaster: String, userConfig: UserConfig,
     clusterConfig: Config = ConfigFactory.empty())
+object AppDescription {
+  implicit val ev: Safe[AppDescription] = new Safe[AppDescription] {}
+}
 
 /**
  * Each job, streaming or not streaming, need to provide an Application class.
@@ -112,6 +116,9 @@ case class AppMasterContext(
  * @param filePath Where the jar file is stored.
  */
 case class AppJar(name: String, filePath: FilePath)
+object AppJar {
+  implicit val ev: Safe[AppJar] = new Safe[AppJar] {}
+}
 
 /**
  * Serves as the context to start an Executor JVM.
@@ -120,6 +127,9 @@ case class AppJar(name: String, filePath: FilePath)
 case class ExecutorContext(
     executorId: Int, worker: WorkerInfo, appId: Int, appName: String,
     appMaster: ActorRef, resource: Resource)
+object ExecutorContext {
+  implicit val ev: Safe[ExecutorContext] = new Safe[ExecutorContext] {}
+}
 
 /**
  * JVM configurations to start an Executor JVM.
@@ -150,15 +160,28 @@ sealed abstract class ApplicationTerminalStatus(override val status: String)
   extends ApplicationStatus(status)
 
 object ApplicationStatus {
-  case object PENDING extends ApplicationStatus("pending")
+  implicit val ev: Safe[ApplicationStatus] = new Safe[ApplicationStatus] {}
+  case object PENDING extends ApplicationStatus("pending") {
+    implicit val ev1: Safe[PENDING.type] = new Safe[PENDING.type] {}
+  }
 
-  case object ACTIVE extends ApplicationStatus("active")
+  case object ACTIVE extends ApplicationStatus("active") {
+    implicit val ev1: Safe[ACTIVE.type] = new Safe[ACTIVE.type] {}
+  }
 
-  case object SUCCEEDED extends ApplicationTerminalStatus("succeeded")
+  case object SUCCEEDED extends ApplicationTerminalStatus("succeeded") {
+    implicit val ev1: Safe[SUCCEEDED.type] = new Safe[SUCCEEDED.type] {}
+  }
 
-  case object FAILED extends ApplicationTerminalStatus("failed")
+  case object FAILED extends ApplicationTerminalStatus("failed") {
+    implicit val ev1: Safe[FAILED.type] = new Safe[FAILED.type] {}
+  }
 
-  case object TERMINATED extends ApplicationTerminalStatus("terminated")
+  case object TERMINATED extends ApplicationTerminalStatus("terminated") {
+    implicit val ev1: Safe[TERMINATED.type] = new Safe[TERMINATED.type] {}
+  }
 
-  case object NONEXIST extends ApplicationStatus("nonexist")
+  case object NONEXIST extends ApplicationStatus("nonexist") {
+    implicit val ev1: Safe[NONEXIST.type] = new Safe[NONEXIST.type] {}
+  }
 }

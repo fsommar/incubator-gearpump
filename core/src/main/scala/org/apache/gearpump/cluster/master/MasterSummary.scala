@@ -19,6 +19,7 @@
 package org.apache.gearpump.cluster.master
 
 import org.apache.gearpump.util.HistoryMetricsService.HistoryMetricsConfig
+import lacasa.Safe
 
 /** Master status. Synced means all masters are live and synced. */
 object MasterStatus {
@@ -31,6 +32,9 @@ case class MasterNode(host: String, port: Int) {
   def toTuple: (String, Int) = {
     (host, port)
   }
+}
+object MasterNode {
+  implicit val ev: Safe[MasterNode] = new Safe[MasterNode] {}
 }
 
 /**
@@ -47,5 +51,11 @@ case class MasterSummary(
     activities: List[MasterActivity],
     jvmName: String,
     historyMetricsConfig: HistoryMetricsConfig = null)
+object MasterSummary {
+  implicit val ev: Safe[MasterSummary] = new Safe[MasterSummary] {}
+}
 
 case class MasterActivity(time: Long, event: String)
+object MasterActivity {
+  implicit val ev: Safe[MasterActivity] = new Safe[MasterActivity] {}
+}

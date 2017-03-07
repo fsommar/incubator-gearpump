@@ -26,6 +26,7 @@ import org.apache.gearpump.cluster.scheduler.Scheduler.ApplicationFinished
 import org.apache.gearpump.cluster.worker.WorkerId
 import org.apache.gearpump.util.LogUtil
 import org.slf4j.Logger
+import lacasa.Safe
 
 import scala.collection.mutable
 
@@ -72,6 +73,12 @@ abstract class Scheduler extends Actor {
 object Scheduler {
   case class PendingRequest(
       appId: Int, appMaster: ActorRef, request: ResourceRequest, timeStamp: TimeStamp)
+  object PendingRequest {
+    implicit val ev: Safe[PendingRequest] = new Safe[PendingRequest] {}
+  }
 
   case class ApplicationFinished(appId: Int)
+  object ApplicationFinished {
+    implicit val ev: Safe[ApplicationFinished] = new Safe[ApplicationFinished] {}
+  }
 }

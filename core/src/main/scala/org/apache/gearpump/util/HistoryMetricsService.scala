@@ -24,6 +24,7 @@ import scala.collection.mutable.ListBuffer
 import akka.actor.Actor
 import com.typesafe.config.Config
 import org.slf4j.Logger
+import lacasa.Safe
 
 import org.apache.gearpump.TimeStamp
 import org.apache.gearpump.cluster.ClientToMaster.{QueryHistoryMetrics, ReadOption}
@@ -262,6 +263,7 @@ object HistoryMetricsService {
       retainRecentDataIntervalMs: Int)
 
   object HistoryMetricsConfig {
+    implicit val ev: Safe[HistoryMetricsConfig] = new Safe[HistoryMetricsConfig] {}
     def apply(config: Config): HistoryMetricsConfig = {
       val historyHour = config.getInt(GEARPUMP_METRIC_RETAIN_HISTORY_DATA_HOURS)
       val historyInterval = config.getInt(GEARPUMP_RETAIN_HISTORY_DATA_INTERVAL_MS)

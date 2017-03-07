@@ -21,6 +21,7 @@ package org.apache.gearpump.cluster
 import akka.actor.{ActorSystem, ExtendedActorSystem}
 import akka.serialization.JavaSerializer
 import com.google.common.io.BaseEncoding
+import lacasa.Safe
 
 
 /**
@@ -153,6 +154,7 @@ final class UserConfig(private val _config: Map[String, String]) extends Seriali
 }
 
 object UserConfig {
+  implicit val ev: Safe[UserConfig] = new Safe[UserConfig] {}
 
   def empty: UserConfig = new UserConfig(Map.empty[String, String])
 

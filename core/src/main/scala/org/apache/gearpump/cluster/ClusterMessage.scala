@@ -29,6 +29,7 @@ import org.apache.gearpump.cluster.master.MasterSummary
 import org.apache.gearpump.cluster.scheduler.{Resource, ResourceAllocation, ResourceRequest}
 import org.apache.gearpump.metrics.Metrics.MetricType
 import lacasa.Safe
+import scala.collection.immutable
 
 object ClientToMaster {
   case object AddMaster {
@@ -142,7 +143,10 @@ object ClientToMaster {
   /** Query history metrics from master or app master. */
   case class QueryHistoryMetrics(
       path: String, readOption: ReadOption.ReadOption = ReadOption.ReadLatest,
-      aggregatorClazz: String = "", options: Map[String, String] = Map.empty[String, String])
+      aggregatorClazz: String = "", options: immutable.Map[String, String] = Map.empty[String, String])
+  object QueryHistoryMetrics {
+    implicit val ev: Safe[QueryHistoryMetrics] = new Safe[QueryHistoryMetrics] {}
+  }
 
   /**
    * If there are message loss, the clock would pause for a while. This message is used to

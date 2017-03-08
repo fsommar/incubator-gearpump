@@ -21,7 +21,7 @@ package org.apache.gearpump.util
 import java.util
 import scala.collection.mutable.ListBuffer
 
-import akka.actor.Actor
+import lacasa.akka.actor.Actor
 import com.typesafe.config.Config
 import org.slf4j.Logger
 import lacasa.Safe

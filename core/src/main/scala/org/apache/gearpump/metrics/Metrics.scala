@@ -96,13 +96,22 @@ object Metrics extends ExtensionId[Metrics] with ExtensionIdProvider {
       stddev: Double, median: Double,
       p95: Double, p99: Double, p999: Double)
     extends MetricType
+  object Histogram {
+    implicit val ev: Safe[Histogram] = new Safe[Histogram] {}
+  }
 
   case class Counter(name: String, value: Long) extends MetricType
+  object Counter {
+    implicit val ev: Safe[Counter] = new Safe[Counter] {}
+  }
 
   case class Meter(
       name: String, count: Long, meanRate: Double,
       m1: Double, rateUnit: String)
     extends MetricType
+  object Meter {
+    implicit val ev: Safe[Meter] = new Safe[Meter] {}
+  }
 
   case class Timer(
       name: String, count: Long, min: Double, max: Double,
@@ -112,12 +121,23 @@ object Metrics extends ExtensionId[Metrics] with ExtensionIdProvider {
       m1: Double, m5: Double, m15: Double,
       rateUnit: String, durationUnit: String)
     extends MetricType
+  object Timer {
+    implicit val ev: Safe[Timer] = new Safe[Timer] {}
+  }
 
   case class Gauge(name: String, value: Long) extends MetricType
+  object Gauge {
+    implicit val ev: Safe[Gauge] = new Safe[Gauge] {}
+  }
 
-  case object ReportMetrics
+  case object ReportMetrics {
+    implicit val ev: Safe[ReportMetrics.type] = new Safe[ReportMetrics.type] {}
+  }
 
   case class DemandMoreMetrics(subscriber: ActorRef)
+  object DemandMoreMetrics {
+    implicit val ev: Safe[DemandMoreMetrics] = new Safe[DemandMoreMetrics] {}
+  }
 
   override def get(system: ActorSystem): Metrics = super.get(system)
 

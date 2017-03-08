@@ -31,6 +31,7 @@ import com.typesafe.config.Config
 import org.apache.commons.lang.exception.ExceptionUtils
 import org.slf4j.Logger
 import lacasa.Safe
+import lacasa.akka.actor.{ActorRef => SafeActorRef}
 
 import org.apache.gearpump.cluster.AppMasterToMaster._
 import org.apache.gearpump.cluster.ClientToMaster._
@@ -94,7 +95,7 @@ private[cluster] class Master extends Actor with Stash {
 
   val getHistoryMetricsConfig = HistoryMetricsConfig(systemConfig)
   val historyMetricsService = if (metricsEnabled) {
-    val historyMetricsService = {
+    val historyMetricsService: SafeActorRef = {
       context.actorOf(Props(new HistoryMetricsService("master", getHistoryMetricsConfig)))
     }
 

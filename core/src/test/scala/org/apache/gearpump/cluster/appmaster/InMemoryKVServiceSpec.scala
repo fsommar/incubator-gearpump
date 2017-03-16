@@ -48,22 +48,22 @@ class InMemoryKVServiceSpec
 
     val client = TestProbe()(system)
 
-    client.send(kvService, PutKV(group, "key", 1))
+    client.sendBox(kvService, PutKV(group, "key", 1))
     client.expectMsg(PutKVSuccess)
 
-    client.send(kvService, PutKV(group, "key", 2))
+    client.sendBox(kvService, PutKV(group, "key", 2))
     client.expectMsg(PutKVSuccess)
 
-    client.send(kvService, GetKV(group, "key"))
+    client.sendBox(kvService, GetKV(group, "key"))
     client.expectMsg(GetKVSuccess("key", 2))
 
-    client.send(kvService, DeleteKVGroup(group))
+    client.sendBox(kvService, DeleteKVGroup(group))
 
     // After DeleteGroup, it no longer accept Get and Put message for this group.
-    client.send(kvService, GetKV(group, "key"))
+    client.sendBox(kvService, GetKV(group, "key"))
     client.expectNoMsg(3.seconds)
 
-    client.send(kvService, PutKV(group, "key", 3))
+    client.sendBox(kvService, PutKV(group, "key", 3))
     client.expectNoMsg(3.seconds)
   }
 }

@@ -30,7 +30,7 @@ import akka.remote.DisassociatedEvent
 import com.typesafe.config.Config
 import org.apache.commons.lang.exception.ExceptionUtils
 import org.slf4j.Logger
-import lacasa.Safe
+import lacasa.{Box, Safe}
 import lacasa.akka.actor.{ActorRef => SafeActorRef}
 
 import org.apache.gearpump.cluster.AppMasterToMaster._
@@ -58,7 +58,7 @@ private[cluster] class Master extends Actor with Stash {
   private val LOG: Logger = LogUtil.getLogger(getClass)
   private val systemConfig: Config = context.system.settings.config
   private implicit val timeout = Constants.FUTURE_TIMEOUT
-  private val kvService = context.actorOf(Props(new InMemoryKVService()), "kvService")
+  private val kvService: SafeActorRef = context.actorOf(Props(new InMemoryKVService()), "kvService")
   // Resources and resourceRequests can be dynamically constructed by
   // heartbeat of worker and appmaster when master singleton is migrated.
   // We don't need to persist them in cluster
@@ -142,10 +142,14 @@ private[cluster] class Master extends Actor with Stash {
     case RegisterNewWorker =>
       val workerId = WorkerId(nextWorkerId, System.currentTimeMillis())
       nextWorkerId += 1
-      kvService ! PutKV(MASTER_GROUP, WORKER_ID, nextWorkerId)
       val workerHostname = ActorUtil.getHostname(sender())
       LOG.info(s"Register new from $workerHostname ....")
-      self forward RegisterWorker(workerId)
+      Box.mkBoxFor(PutKV(MASTER_GROUP, WORKER_ID, nextWorkerId)) { packed =>
+        implicit val acc = packed.access
+        kvService.sendAndThen(packed.box) { () =>
+          self forward RegisterWorker(workerId)
+        }
+      }
 
     case RegisterWorker(id) =>
       context.watch(sender())

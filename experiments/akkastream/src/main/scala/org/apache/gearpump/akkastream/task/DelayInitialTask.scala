@@ -27,8 +27,11 @@ import org.apache.gearpump.streaming.task.TaskContext
 
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
+import lacasa.Safe
 
-case object DelayInitialTime
+case object DelayInitialTime {
+  implicit val ev: Safe[DelayInitialTime.type] = new Safe[DelayInitialTime.type] {}
+}
 
 class DelayInitialTask[T](context: TaskContext, userConf : UserConfig)
   extends GraphTask(context, userConf) {

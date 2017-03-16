@@ -33,6 +33,7 @@ import org.apache.gearpump.util.Constants._
 import org.apache.gearpump.util.LogUtil.ProcessType
 import org.apache.gearpump.util.{AkkaApp, Constants, LogUtil}
 import org.slf4j.Logger
+import lacasa.Safe
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable
@@ -231,6 +232,7 @@ class MasterWatcher(role: String) extends Actor with ActorLogging {
 }
 
 object MasterWatcher {
-  object Shutdown
+  object Shutdown {
+    implicit val ev: Safe[Shutdown.type] = new Safe[Shutdown.type] {}
+  }
 }
-

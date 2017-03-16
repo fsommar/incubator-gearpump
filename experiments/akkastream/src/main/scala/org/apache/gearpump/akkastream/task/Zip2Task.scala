@@ -22,9 +22,11 @@ import org.apache.gearpump.Message
 import org.apache.gearpump.akkastream.task.Zip2Task.ZipFunction
 import org.apache.gearpump.cluster.UserConfig
 import org.apache.gearpump.streaming.task.TaskContext
+import lacasa.Safe
 
 class Zip2Task[A1, A2, OUT](context: TaskContext, userConf : UserConfig)
   extends GraphTask(context, userConf) {
+  implicit val outSafe: Safe[OUT] = implicitly
 
   val zip = userConf.
     getValue[ZipFunction[A1, A2, OUT]](Zip2Task.ZIP2_FUNCTION)(context.system).get.zip

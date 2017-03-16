@@ -19,6 +19,7 @@
 package org.apache.gearpump.experiments.storm.topology
 
 import java.util.{List => JList}
+import lacasa.Safe
 
 import backtype.storm.task.GeneralTopologyContext
 import backtype.storm.tuple.{Tuple, TupleImpl}
@@ -61,6 +62,11 @@ private[storm] class GearpumpTuple(
     val state = Seq(values, sourceTaskId, sourceStreamId)
     state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
   }
+}
+
+object GearpumpTuple {
+  // TODO(fsommar): Ensure this is actually safe, by using immutable data structures for List and Map.
+  implicit val ev: Safe[GearpumpTuple] = new Safe[GearpumpTuple] {}
 }
 
 case class TimedTuple(topologyContext: GeneralTopologyContext, tuple: JList[AnyRef],

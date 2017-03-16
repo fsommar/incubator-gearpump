@@ -21,6 +21,7 @@ package org.apache.gearpump.streaming.dsl.partitioner
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 import org.apache.gearpump.Message
 import org.apache.gearpump.streaming.dsl.partitioner.GroupByPartitionerSpec.People
+import lacasa.Safe
 
 class GroupByPartitionerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
@@ -41,5 +42,6 @@ class GroupByPartitionerSpec extends FlatSpec with Matchers with BeforeAndAfterA
 }
 
 object GroupByPartitionerSpec {
+  implicit val peopleIsSafe: Safe[People] = new Safe[People] {}
   case class People(name: String, gender: String)
 }

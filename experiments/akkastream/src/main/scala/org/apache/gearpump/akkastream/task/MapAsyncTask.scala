@@ -23,9 +23,12 @@ import org.apache.gearpump.cluster.UserConfig
 import org.apache.gearpump.streaming.task.TaskContext
 
 import scala.concurrent.Future
+import lacasa.Safe
 
 class MapAsyncTask[In, Out](context: TaskContext, userConf : UserConfig)
   extends GraphTask(context, userConf) {
+  implicit val inSafe: Safe[In] = implicitly
+  implicit val outSafe: Safe[Out] = implicitly
 
   val f = userConf.getValue[In => Future[Out]](MapAsyncTask.MAPASYNC_FUNC)
   implicit val ec = context.system.dispatcher
@@ -38,7 +41,7 @@ class MapAsyncTask[In, Out](context: TaskContext, userConf : UserConfig)
         val fout = func(data)
         fout.onComplete(value => {
           value.foreach(out => {
-            val msg = new Message(out, time)
+            val msg = Message(out, time)
             context.output(msg)
           })
         })

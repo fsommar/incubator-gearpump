@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.FiniteDuration
 
 import akka.actor._
+import lacasa.Safe
 
 import org.apache.gearpump.cluster.AppMasterToMaster.RegisterAppMaster
 import org.apache.gearpump.cluster.MasterToAppMaster.AppMasterRegistered
@@ -84,13 +85,19 @@ class MasterConnectionKeeper(
 
 private[appmaster] object MasterConnectionKeeper {
 
-  case object AppMasterRegisterTimeout
+  case object AppMasterRegisterTimeout {
+    implicit val ev: Safe[AppMasterRegisterTimeout.type] = new Safe[AppMasterRegisterTimeout.type] {}
+  }
 
   object MasterConnectionStatus {
 
-    case object MasterConnected
+    case object MasterConnected {
+      implicit val ev: Safe[MasterConnected.type] = new Safe[MasterConnected.type] {}
+    }
 
-    case object MasterStopped
+    case object MasterStopped {
+      implicit val ev: Safe[MasterStopped.type] = new Safe[MasterStopped.type] {}
+    }
 
   }
 

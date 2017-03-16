@@ -36,6 +36,8 @@ import org.apache.gearpump.cluster.master.Master._
 import org.apache.gearpump.util.Constants._
 import org.apache.gearpump.util.{ActorUtil, TimeOutScheduler, Util, _}
 import org.slf4j.Logger
+import lacasa.Safe
+import lacasa.akka.actor.{ActorRef => SafeActorRef}
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -44,7 +46,7 @@ import scala.util.{Failure, Success}
 /**
  * AppManager is dedicated child of Master to manager all applications.
  */
-private[cluster] class AppManager(kvService: ActorRef, launcher: AppMasterLauncherFactory)
+private[cluster] class AppManager(kvService: SafeActorRef, launcher: AppMasterLauncherFactory)
   extends Actor with Stash with TimeOutScheduler {
 
   private val LOG: Logger = LogUtil.getLogger(getClass)
@@ -356,6 +358,9 @@ object AppManager {
   final val MASTER_STATE = "master_state"
 
   case class RecoverApplication(appMetaData: ApplicationMetaData)
+  object RecoverApplication {
+    implicit val ev: Safe[RecoverApplication] = new Safe[RecoverApplication] {}
+  }
 
   case class MasterState(maxId: Int, applicationRegistry: Map[Int, ApplicationRuntimeInfo])
 }

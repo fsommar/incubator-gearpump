@@ -23,9 +23,13 @@ import java.time.Instant
 import org.apache.gearpump.Message
 import org.apache.gearpump.cluster.UserConfig
 import org.apache.gearpump.streaming.task.TaskContext
+import lacasa.Safe
 
 class StatefulMapConcatTask[IN, OUT](context: TaskContext, userConf : UserConfig)
   extends GraphTask(context, userConf) {
+  implicit val inSafe: Safe[IN] = implicitly
+  implicit val outSafe: Safe[OUT] = implicitly
+
 
   val func = userConf.getValue[() => IN => Iterable[OUT]](StatefulMapConcatTask.FUNC).get
   var f: IN => Iterable[OUT] = _

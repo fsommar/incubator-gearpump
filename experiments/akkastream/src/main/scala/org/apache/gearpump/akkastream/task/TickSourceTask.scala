@@ -25,11 +25,13 @@ import java.util.concurrent.TimeUnit
 import org.apache.gearpump.Message
 import org.apache.gearpump.cluster.UserConfig
 import org.apache.gearpump.streaming.task.TaskContext
+import lacasa.Safe
 
 import scala.concurrent.duration.FiniteDuration
 
 class TickSourceTask[T](context: TaskContext, userConf : UserConfig)
   extends GraphTask(context, userConf) {
+  implicit val ev: Safe[T] = implicitly
 
   val initialDelay = userConf.getValue[FiniteDuration](TickSourceTask.INITIAL_DELAY).
     getOrElse(FiniteDuration(0, TimeUnit.MINUTES))

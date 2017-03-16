@@ -22,6 +22,7 @@ import scala.concurrent.duration.FiniteDuration
 
 import akka.actor._
 import org.slf4j.Logger
+import lacasa.Safe
 
 import org.apache.gearpump.transport.HostPort
 import org.apache.gearpump.util.{ActorUtil, LogUtil}
@@ -122,9 +123,16 @@ class MasterProxy(masters: Iterable[ActorPath], timeout: FiniteDuration)
 }
 
 object MasterProxy {
-  case object MasterRestarted
-  case object MasterStopped
+  case object MasterRestarted {
+    implicit val ev: Safe[MasterRestarted.type] = new Safe[MasterRestarted.type] {}
+  }
+  case object MasterStopped {
+    implicit val ev: Safe[MasterStopped.type] = new Safe[MasterStopped.type] {}
+  }
   case class WatchMaster(watcher: ActorRef)
+  object WatchMaster {
+    implicit val ev: Safe[WatchMaster] = new Safe[WatchMaster] {}
+  }
 
   import scala.concurrent.duration._
   def props(masters: Iterable[HostPort], duration: FiniteDuration = 30.seconds): Props = {

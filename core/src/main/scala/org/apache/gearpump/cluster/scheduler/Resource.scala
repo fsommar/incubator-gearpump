@@ -20,6 +20,7 @@ package org.apache.gearpump.cluster.scheduler
 
 import akka.actor.ActorRef
 import org.apache.gearpump.cluster.worker.WorkerId
+import lacasa.Safe
 
 case class Resource(slots: Int) {
 
@@ -68,12 +69,18 @@ import org.apache.gearpump.cluster.scheduler.Relaxation._
 case class ResourceRequest(
     resource: Resource, workerId: WorkerId, priority: Priority = NORMAL,
     relaxation: Relaxation = ANY, executorNum: Int = 1)
+object ResourceRequest {
+  implicit val ev: Safe[ResourceRequest] = new Safe[ResourceRequest] {}
+}
 
 case class ResourceAllocation(resource: Resource, worker: ActorRef, workerId: WorkerId)
+object ResourceAllocation {
+  implicit val ev: Safe[ResourceAllocation] = new Safe[ResourceAllocation] {}
+}
 
 object Resource {
+  implicit val ev: Safe[Resource] = new Safe[Resource] {}
   def empty: Resource = new Resource(0)
 
   def min(res1: Resource, res2: Resource): Resource = if (res1.slots < res2.slots) res1 else res2
 }
-

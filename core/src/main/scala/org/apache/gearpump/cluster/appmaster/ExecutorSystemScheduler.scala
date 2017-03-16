@@ -24,6 +24,7 @@ import scala.concurrent.duration._
 
 import akka.actor._
 import com.typesafe.config.Config
+import lacasa.Safe
 
 import org.apache.gearpump.cluster.AppMasterToMaster.RequestResource
 import org.apache.gearpump.cluster.MasterToAppMaster.ResourceAllocated
@@ -132,8 +133,13 @@ object ExecutorSystemScheduler {
   case class ExecutorSystemStarted(system: ExecutorSystem, boundedJar: Option[AppJar])
 
   case class StopExecutorSystem(system: ExecutorSystem)
+  object StopExecutorSystem {
+    implicit val ev: Safe[StopExecutorSystem] = new Safe[StopExecutorSystem] {}
+  }
 
-  case object StartExecutorSystemTimeout
+  case object StartExecutorSystemTimeout {
+    implicit val ev: Safe[StartExecutorSystemTimeout.type] = new Safe[StartExecutorSystemTimeout.type] {}
+  }
 
   case class ExecutorSystemJvmConfig(classPath: Array[String], jvmArguments: Array[String],
       jar: Option[AppJar], username: String, executorAkkaConfig: Config = null)

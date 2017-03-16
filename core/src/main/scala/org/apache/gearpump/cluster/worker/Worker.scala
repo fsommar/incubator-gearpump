@@ -45,6 +45,8 @@ import org.apache.gearpump.util.Constants._
 import org.apache.gearpump.util.HistoryMetricsService.HistoryMetricsConfig
 import org.apache.gearpump.util.{TimeOutScheduler, _}
 import org.slf4j.Logger
+import lacasa.Safe
+import lacasa.akka.actor.{ActorRef => SafeActorRef}
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future, Promise}
@@ -76,7 +78,7 @@ private[cluster] class Worker(masterProxy: ActorRef) extends Actor with TimeOutS
   private var totalSlots: Int = 0
 
   val metricsEnabled = systemConfig.getBoolean(GEARPUMP_METRIC_ENABLED)
-  var historyMetricsService: Option[ActorRef] = None
+  var historyMetricsService: Option[SafeActorRef] = None
 
   override def receive: Receive = null
   var LOG: Logger = LogUtil.getLogger(getClass)
@@ -108,7 +110,7 @@ private[cluster] class Worker(masterProxy: ActorRef) extends Actor with TimeOutS
     Metrics(context.system).register(new JvmMetricsSet(metricsSetName))
 
     historyMetricsService = if (metricsEnabled) {
-      val historyMetricsService = {
+      val historyMetricsService: SafeActorRef = {
         context.actorOf(Props(new HistoryMetricsService(metricsSetName, getHistoryMetricsConfig)))
       }
 
@@ -332,6 +334,9 @@ private[cluster] class Worker(masterProxy: ActorRef) extends Actor with TimeOutS
 private[cluster] object Worker {
 
   case class ExecutorResult(result: Try[Int])
+  object ExecutorResult {
+    implicit val ev: Safe[ExecutorResult] = new Safe[ExecutorResult] {}
+  }
 
   class ExecutorWatcher(
       launch: LaunchExecutor,

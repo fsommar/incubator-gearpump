@@ -26,6 +26,7 @@ import scala.util.{Failure, Success, Try}
 import akka.actor._
 import com.typesafe.config.Config
 import org.slf4j.Logger
+import lacasa.Safe
 
 import org.apache.gearpump.cluster.ClusterConfig
 import org.apache.gearpump.util.LogUtil.ProcessType
@@ -81,20 +82,43 @@ object ActorSystemBooter {
   }
 
   case class BindLifeCycle(actor: ActorRef)
+  object BindLifeCycle {
+    implicit val ev: Safe[BindLifeCycle] = new Safe[BindLifeCycle] {}
+  }
   case class CreateActor(prop: Props, name: String)
+  object CreateActor {
+    implicit val ev: Safe[CreateActor] = new Safe[CreateActor] {}
+  }
   case class ActorCreated(actor: ActorRef, name: String)
+  object ActorCreated {
+    implicit val ev: Safe[ActorCreated] = new Safe[ActorCreated] {}
+  }
   case class CreateActorFailed(name: String, reason: Throwable)
+  object CreateActorFailed {
+    implicit val ev: Safe[CreateActorFailed] = new Safe[CreateActorFailed] {}
+  }
 
   case class RegisterActorSystem(systemPath: String)
+  object RegisterActorSystem {
+    implicit val ev: Safe[RegisterActorSystem] = new Safe[RegisterActorSystem] {}
+  }
 
   /**
    * This actor system will watch for parent,
    * If parent dies, this will also die
    */
   case class ActorSystemRegistered(bindLifeWith: ActorRef)
+  object ActorSystemRegistered {
+    implicit val ev: Safe[ActorSystemRegistered] = new Safe[ActorSystemRegistered] {}
+  }
   case class RegisterActorSystemFailed(reason: Throwable)
+  object RegisterActorSystemFailed {
+    implicit val ev: Safe[RegisterActorSystemFailed] = new Safe[RegisterActorSystemFailed] {}
+  }
 
-  object RegisterActorSystemTimeOut
+  object RegisterActorSystemTimeOut {
+    implicit val ev: Safe[RegisterActorSystemTimeOut.type] = new Safe[RegisterActorSystemTimeOut.type] {}
+  }
 
   class Daemon(val name: String, reportBack: String) extends Actor {
     val LOG: Logger = LogUtil.getLogger(getClass, context = name)

@@ -19,7 +19,8 @@
 package org.apache.gearpump.streaming.appmaster
 
 import akka.actor.{ActorSystem, Props}
-import akka.testkit.TestProbe
+import lacasa.akka.testkit.TestProbe
+import lacasa.akka.actor.{ActorRef => SafeActorRef}
 import org.apache.gearpump.cluster.ClientToMaster.QueryHistoryMetrics
 import org.apache.gearpump.cluster.MasterToClient.HistoryMetrics
 import org.apache.gearpump.cluster.TestUtil
@@ -125,7 +126,7 @@ class HistoryMetricsServiceSpec extends FlatSpec with Matchers with BeforeAndAft
     "retain lastest metrics data and allow user to query metrics by path" in {
     implicit val system = ActorSystem("test", TestUtil.DEFAULT_CONFIG)
     val appId = 0
-    val service = system.actorOf(Props(new HistoryMetricsService("app0", config)))
+    val service: SafeActorRef = system.actorOf(Props(new HistoryMetricsService("app0", config)))
     service ! Counter("metric.counter", 0)
     service ! Meter("metric.meter", 0, 0, 0, null)
     service ! Histogram("metric.histogram", 0, 0, 0, 0, 0, 0)
@@ -133,7 +134,7 @@ class HistoryMetricsServiceSpec extends FlatSpec with Matchers with BeforeAndAft
     val client = TestProbe()
 
     // Filters metrics with path "metric.counter"
-    client.send(service, QueryHistoryMetrics("metric.counter"))
+    client.sendSafe(service, QueryHistoryMetrics("metric.counter"))
     import scala.concurrent.duration._
     client.expectMsgPF(3.seconds) {
       case history: HistoryMetrics =>
@@ -145,7 +146,7 @@ class HistoryMetricsServiceSpec extends FlatSpec with Matchers with BeforeAndAft
     }
 
     // Filters metrics with path "metric.meter"
-    client.send(service, QueryHistoryMetrics("metric.meter"))
+    client.sendSafe(service, QueryHistoryMetrics("metric.meter"))
     client.expectMsgPF(3.seconds) {
       case history: HistoryMetrics =>
         assert(history.path == "metric.meter")
@@ -156,7 +157,7 @@ class HistoryMetricsServiceSpec extends FlatSpec with Matchers with BeforeAndAft
     }
 
     // Filters metrics with path "metric.histogram"
-    client.send(service, QueryHistoryMetrics("metric.histogram"))
+    client.sendSafe(service, QueryHistoryMetrics("metric.histogram"))
     client.expectMsgPF(3.seconds) {
       case history: HistoryMetrics =>
         assert(history.path == "metric.histogram")
@@ -168,7 +169,7 @@ class HistoryMetricsServiceSpec extends FlatSpec with Matchers with BeforeAndAft
 
     // Filters metrics with path prefix "metric", all metrics which can
     // match the path prefix will be retained.
-    client.send(service, QueryHistoryMetrics("metric"))
+    client.sendSafe(service, QueryHistoryMetrics("metric"))
     client.expectMsgPF(3.seconds) {
       case history: HistoryMetrics =>
         val metricList = history.metrics

@@ -19,6 +19,7 @@
 package org.apache.gearpump.streaming.kafka.lib.source
 
 import java.time.Instant
+import lacasa.Safe
 
 import org.apache.gearpump.Message
 import org.apache.gearpump.streaming.kafka.lib.{MessageAndWatermark, KafkaMessageDecoder}
@@ -27,6 +28,8 @@ class DefaultKafkaMessageDecoder extends KafkaMessageDecoder {
 
   override def fromBytes(key: Array[Byte], value: Array[Byte]): MessageAndWatermark = {
     val time = Instant.now()
+    // TODO(fsommar): Use List[Byte] instead
+    implicit val ev: Safe[Array[Byte]] = new Safe[Array[Byte]] {}
     MessageAndWatermark(Message(value, time), time)
   }
 

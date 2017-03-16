@@ -45,6 +45,7 @@ import org.apache.gearpump.util.Constants.{APPMASTER_DEFAULT_EXECUTOR_ID, _}
 import org.apache.gearpump.util.HistoryMetricsService.HistoryMetricsConfig
 import org.apache.gearpump.util._
 import org.slf4j.Logger
+import lacasa.akka.actor.{ActorRef => SafeActorRef}
 
 import scala.concurrent.Future
 
@@ -111,8 +112,8 @@ class AppMaster(appContext: AppMasterContext, app: AppDescription) extends Appli
     Metrics(context.system).register(new JvmMetricsSet(
       s"app$appId.executor$APPMASTER_DEFAULT_EXECUTOR_ID"))
 
-    val historyMetricsService = context.actorOf(Props(new HistoryMetricsService(
-      s"app$appId", getHistoryMetricsConfig)))
+    val historyMetricsService: SafeActorRef = context.actorOf(Props(
+      new HistoryMetricsService(s"app$appId", getHistoryMetricsConfig)))
 
     val metricsReportService = context.actorOf(Props(
       new MetricsReporterService(Metrics(context.system))))

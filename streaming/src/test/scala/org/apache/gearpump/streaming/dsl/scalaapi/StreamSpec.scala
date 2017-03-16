@@ -118,7 +118,7 @@ object StreamSpec {
       msg.msg match {
         case Left(wordCount: (String @unchecked, Int @unchecked)) =>
           if (query != null && wordCount._1 == query) {
-            taskContext.output(new Message(wordCount))
+            taskContext.output(Message(wordCount))
           }
 
         case Right(query: String) =>

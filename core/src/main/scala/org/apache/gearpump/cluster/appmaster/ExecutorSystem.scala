@@ -19,12 +19,16 @@
 package org.apache.gearpump.cluster.appmaster
 
 import akka.actor.{ActorRef, Address, PoisonPill}
+import lacasa.Safe
 
 import org.apache.gearpump.cluster.scheduler.Resource
 import org.apache.gearpump.cluster.worker.WorkerId
 import org.apache.gearpump.util.ActorSystemBooter.BindLifeCycle
 
 case class WorkerInfo(workerId: WorkerId, ref: ActorRef)
+object WorkerInfo {
+  implicit val ev: Safe[WorkerInfo] = new Safe[WorkerInfo] {}
+}
 
 /**
  * Configurations to start an executor system on remote machine
@@ -40,4 +44,7 @@ case class ExecutorSystem(executorSystemId: Int, address: Address, daemon:
   def shutdown(): Unit = {
     daemon ! PoisonPill
   }
+}
+object ExecutorSystem {
+  implicit val ev: Safe[ExecutorSystem] = new Safe[ExecutorSystem] {}
 }

@@ -20,6 +20,7 @@ package org.apache.gearpump.cluster.appmaster
 
 import org.apache.gearpump.cluster.{AppDescription, AppJar}
 import akka.routing.MurmurHash._
+import lacasa.Safe
 
 /**
  * The meta data of an application, which stores the crucial infomation of how to launch
@@ -28,3 +29,6 @@ import akka.routing.MurmurHash._
  */
 case class ApplicationMetaData(appId: Int, attemptId: Int, appDesc: AppDescription,
     jar: Option[AppJar], username: String)
+object ApplicationMetaData {
+  implicit val ev: Safe[ApplicationMetaData] = new Safe[ApplicationMetaData] {}
+}

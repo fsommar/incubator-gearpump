@@ -24,6 +24,7 @@ import com.twitter.bijection.Injection
 import org.apache.gearpump.Message
 import org.apache.gearpump.cluster.UserConfig
 import org.apache.gearpump.streaming.task.{Task, TaskContext}
+import lacasa.Safe
 
 class Sum(taskContext: TaskContext, conf: UserConfig) extends Task(taskContext, conf) {
   import taskContext.output
@@ -36,7 +37,9 @@ class Sum(taskContext: TaskContext, conf: UserConfig) extends Task(taskContext, 
     val word = message.msg.asInstanceOf[String]
     val count = wordcount.getOrElse(word, 0L) + 1
     wordcount += word -> count
-    output(new Message(
+    // TODO(fsommar): Use IndexedSeq[Byte] instead.
+    implicit val ev: Safe[Array[Byte]] = new Safe[Array[Byte]] {}
+    output(Message(
       Injection[String, Array[Byte]](word) ->
         Injection[Long, Array[Byte]](count),
       message.timestamp))

@@ -19,6 +19,7 @@
 package org.apache.gearpump
 
 import java.time.Instant
+import lacasa.Safe
 
 /**
  * Each message contains an immutable timestamp.
@@ -28,38 +29,23 @@ import java.time.Instant
  *
  * @param msg Accept any type except Null, Nothing and Unit
  */
-case class Message(msg: Any, timeInMillis: TimeStamp) {
-
-  /**
-   * @param msg Accept any type except Null, Nothing and Unit
-   * @param timestamp timestamp cannot be larger than Instant.ofEpochMilli(Long.MaxValue)
-   */
-  def this(msg: Any, timestamp: Instant) = {
-    this(msg, timestamp.toEpochMilli)
-  }
-
-  /**
-   * Instant.EPOCH is used for default timestamp
-   *
-   * @param msg Accept any type except Null, Nothing and Uni
-   */
-  def this(msg: Any) = {
-    this(msg, Instant.EPOCH)
-  }
-
-  def timestamp: Instant = {
-    Instant.ofEpochMilli(timeInMillis)
-  }
+sealed trait Message {
+  def msg: Any
+  def timeInMillis: TimeStamp
+  def timestamp: Instant
+  def copy(msg: Any = msg, timeInMillis: TimeStamp = timeInMillis): Message
 }
 
 object Message {
+  import org.apache.gearpump
+  implicit val ev: Safe[gearpump.Message] = new Safe[gearpump.Message] {}
 
   /**
    * Instant.EPOCH is used for default timestamp
    *
    * @param msg Accept any type except Null, Nothing and Uni
    */
-  def apply(msg: Any): Message = {
+  def apply[T: Safe](msg: T): gearpump.Message = {
     new Message(msg)
   }
 
@@ -67,7 +53,41 @@ object Message {
    * @param msg Accept any type except Null, Nothing and Unit
    * @param timestamp timestamp cannot be larger than Instant.ofEpochMilli(Long.MaxValue)
    */
-  def apply(msg: Any, timestamp: Instant): Message = {
+  def apply[T: Safe](msg: T, timestamp: Instant): gearpump.Message = {
     new Message(msg, timestamp)
+  }
+
+  def apply[T: Safe](msg: T, timeInMillis: TimeStamp): gearpump.Message = {
+    new Message(msg, timeInMillis)
+  }
+
+  def unapply(msg: gearpump.Message): Option[(Any, TimeStamp)] = {
+    Some((msg.msg, msg.timeInMillis))
+  }
+
+  private case class Message (msg: Any, timeInMillis: TimeStamp) extends gearpump.Message {
+
+    /**
+    * @param msg Accept any type except Null, Nothing and Unit
+    * @param timestamp timestamp cannot be larger than Instant.ofEpochMilli(Long.MaxValue)
+    */
+    def this(msg: Any, timestamp: Instant) = {
+      this(msg, timestamp.toEpochMilli)
+    }
+
+    /**
+    * Instant.EPOCH is used for default timestamp
+    *
+    * @param msg Accept any type except Null, Nothing and Uni
+    */
+    def this(msg: Any) = {
+      this(msg, Instant.EPOCH)
+    }
+
+    def timestamp: Instant = {
+      Instant.ofEpochMilli(timeInMillis)
+    }
+
+    def copy(msg: Any = msg, timeInMillis: TimeStamp = timeInMillis): gearpump.Message = this.copy(msg, timeInMillis)
   }
 }

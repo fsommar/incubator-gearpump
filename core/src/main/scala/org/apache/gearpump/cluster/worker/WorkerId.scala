@@ -18,6 +18,8 @@
 
 package org.apache.gearpump.cluster.worker
 
+import lacasa.Safe
+
 /**
  * WorkerId is used to uniquely track a worker machine.
  *
@@ -28,6 +30,7 @@ package org.apache.gearpump.cluster.worker
 case class WorkerId(sessionId: Int, registerTime: Long)
 
 object WorkerId {
+  implicit val ev: Safe[WorkerId] = new Safe[WorkerId] {}
   val unspecified: WorkerId = new WorkerId(-1, 0L)
 
   def render(workerId: WorkerId): String = {

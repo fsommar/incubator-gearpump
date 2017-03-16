@@ -21,9 +21,11 @@ package org.apache.gearpump.akkastream.task
 import org.apache.gearpump.Message
 import org.apache.gearpump.cluster.UserConfig
 import org.apache.gearpump.streaming.task.TaskContext
+import lacasa.Safe
 
 class SingleSourceTask[T](context: TaskContext, userConf : UserConfig)
   extends GraphTask(context, userConf) {
+  implicit val safeEv: Safe[T] = implicitly
 
   val elem = userConf.getValue[T](SingleSourceTask.ELEMENT).get
 

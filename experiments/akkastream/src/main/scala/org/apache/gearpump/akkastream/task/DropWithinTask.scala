@@ -26,8 +26,11 @@ import org.apache.gearpump.cluster.UserConfig
 import org.apache.gearpump.streaming.task.TaskContext
 
 import scala.concurrent.duration.FiniteDuration
+import lacasa.Safe
 
-case object DropWithinTimeout
+case object DropWithinTimeout {
+  implicit val ev: Safe[DropWithinTimeout.type] = new Safe[DropWithinTimeout.type] {}
+}
 
 class DropWithinTask[T](context: TaskContext, userConf : UserConfig)
   extends GraphTask(context, userConf) {
